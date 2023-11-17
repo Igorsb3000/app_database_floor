@@ -1,12 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_database_app/ui/home_page.dart';
 
+import 'helpers/database_manager.dart';
+
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final DatabaseManager databaseManager = DatabaseManager();
+
+  MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppWrapper(databaseManager: databaseManager,);
+  }
+}
+
+class AppWrapper extends StatefulWidget {
+  final DatabaseManager databaseManager;
+
+  const AppWrapper({Key? key, required this.databaseManager}) : super(key: key);
+
+  @override
+  _AppWrapperState createState() => _AppWrapperState();
+}
+
+class _AppWrapperState extends State<AppWrapper> {
+  @override
+  void dispose() {
+    widget.databaseManager.closeDatabase();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +40,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
         textTheme: TextTheme(
           displayLarge: TextStyle(
@@ -29,8 +55,20 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const HomePage(),
+      home: FutureBuilder(
+        future: widget.databaseManager.openDatabase(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return HomePage(databaseManager: widget.databaseManager);
+            }
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }
-

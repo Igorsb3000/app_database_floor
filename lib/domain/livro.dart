@@ -1,36 +1,20 @@
+import 'package:floor/floor.dart';
+
+@entity
 class Livro{
+  @PrimaryKey(autoGenerate: true)
+  final int? id;
 
-  static const String livroTable = "livro_table";
-  static const String idColumn = "id";
-  static const String tituloColumn = "titulo";
-  static const String autorColumn = "autor";
-  static const String anoPublicacaoColumn = "ano_publicacao";
-  static const String avaliacaoColumn = "avaliacao";
+  String titulo;
 
-  int id = 0;
-  String titulo = '';
-  String autor = '';
-  int anoPublicacao = 0;
-  double avaliacao = 0;
+  String autor;
 
-  Livro(this.titulo, this.autor, this.anoPublicacao, this.avaliacao);
+  int anoPublicacao;
 
-  Livro.fromMap(Map map) {
-    id = map[idColumn];
-    titulo = map[tituloColumn];
-    autor = map[autorColumn];
-    anoPublicacao = map[anoPublicacaoColumn];
-    avaliacao = map[avaliacaoColumn];
-  }
+  double avaliacao;
 
-  Map<String, dynamic> toMap() {
-    return {
-      tituloColumn: titulo,
-      autorColumn: autor,
-      anoPublicacaoColumn:anoPublicacao,
-      avaliacaoColumn:avaliacao
-    };
-  }
+  Livro({required this.id, required this.titulo, required this.autor, required this.anoPublicacao, required this.avaliacao});
+
 
   @override
   String toString() {
