@@ -27,11 +27,33 @@ class AppWrapper extends StatefulWidget {
   _AppWrapperState createState() => _AppWrapperState();
 }
 
-class _AppWrapperState extends State<AppWrapper> {
+class _AppWrapperState extends State<AppWrapper> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
   @override
   void dispose() {
     widget.databaseManager.closeDatabase();
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      // Chama o dispose() quando o aplicativo é pausado ou fechado
+      dispose();
+    }
+    if (state == AppLifecycleState.resumed) {
+      if(mounted){
+        // Quando o aplicativo é retomado, reabra a conexão com o banco de dados
+        widget.databaseManager.openDatabase();
+      }
+
+    }
   }
 
   @override
